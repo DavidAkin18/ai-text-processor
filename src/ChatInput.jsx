@@ -92,7 +92,7 @@ const ChatInput = ({ setMessages, setTranslatedMessage, setDetectedLang, setTarg
                   Select translation language
               </label>
               <div className="action-button">
-                <div>
+                <div className="action-button-select">
                   <select 
                     className="language-select" 
                     value={targetLang} 
