@@ -7,6 +7,12 @@
  body{
   background: #F5EDF0;
  }
+ .logo{
+  height: 40px;
+  width: 60px;
+  border-radius: 10px;
+  padding-left: 30px;
+ }
 .header{
   color: #3D2C2E;
   text-align: center;
@@ -64,8 +70,6 @@
   padding: 0 10px;
   width: 98%;
   margin: 5px auto;
-
-  /* flex-wrap: wrap; */
 }
 
 .action-button {
@@ -152,7 +156,12 @@
 
 .message-section {
   text-align: center;
- 
+}
+.message-sum{
+  text-align: center;
+  padding: 0 25px;
+  padding-bottom: 25px;
+  color: #3D2C2E;
 }
 
 .message-section h1 {
@@ -192,10 +201,15 @@
 }
 
 .message-box {
+  border: none;
   border-left: 4px solid #424C55;
 }
-
+.summary-box{
+  border: none;
+  border-left: 4px solid #3D2C2E;
+}
 .translation-box {
+  border: none;
   border-left: 4px solid #886F68;
 }
 
@@ -224,7 +238,8 @@
   }
   .chat-message-container{
     flex-direction: column;
-    gap: 5px;
+    gap: 15px;
+    padding: 25px;
   }
   .ri-arrow-up-down-fill{
     display: block;
@@ -248,6 +263,12 @@
     padding: 0;
     gap: 2px;
     width: 100%;
+  }
+  .language-select, .translate-btn, .summarize-btn{
+    padding: 5px;
+  }
+  .logo{
+    padding-left: 5px;
   }
  
 }
