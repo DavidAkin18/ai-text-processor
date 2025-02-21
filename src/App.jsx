@@ -6,28 +6,29 @@ const App = () => {
   const [messages, setMessages] = useState(""); 
   const [translatedMessage, setTranslatedMessage] = useState("");
   const [detectedLang, setDetectedLang] = useState(""); 
-  const [targetLang, setTargetLang] = useState("en"); // ✅ Add state for target language
+  const [targetLang, setTargetLang] = useState("en"); 
+  const [summaryMessage, setSummaryMessage] = useState(""); // ✅ State for summary
 
   return (
     <>
       <div className="app-container">
         <h1 className="header">AI-Powered Text Processing Interface</h1>
         <div className="shift">
-          <div>
-            <ChatInput 
-              setMessages={setMessages} 
-              setTranslatedMessage={setTranslatedMessage} 
-              messages={messages} 
-              setDetectedLang={setDetectedLang}
-              setTargetLang={setTargetLang} // ✅ Pass setTargetLang to update the target language
-              targetLang={targetLang} // ✅ Pass current target language
-            />
-          </div>
+          <ChatInput 
+            setMessages={setMessages} 
+            setTranslatedMessage={setTranslatedMessage} 
+            messages={messages} 
+            setDetectedLang={setDetectedLang}
+            setTargetLang={setTargetLang} 
+            targetLang={targetLang}
+            setSummaryMessage={setSummaryMessage} // ✅ Pass summary state
+          />
           <ChatMessage 
             messages={messages} 
             translatedMessage={translatedMessage} 
             detectedLang={detectedLang}
-            targetLang={targetLang} // ✅ Pass target language
+            targetLang={targetLang} 
+            summaryMessage={summaryMessage} // ✅ Pass summary state
           />
         </div>
       </div>
