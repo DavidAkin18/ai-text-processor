@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import axios from "axios";
 
 const languageMap = {
@@ -8,35 +8,29 @@ const languageMap = {
   ru: "Russian",
   tr: "Turkish",
   fr: "French",
-  yr: "Yoruba"
 };
 
 const ChatInput = ({ setMessages, setTranslatedMessage, setSummaryMessage, setDetectedLang, setTargetLang, targetLang, messages }) => {
   const [textMessage, setTextMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState(""); 
-  const [summarizerAvailable, setSummarizerAvailable] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [apiError, setApiError] = useState("");
 
-  const API_KEY = "AIzaSyD-Zjbfq2jpi9Vr1X_epT1zYkEt550Xrro"; 
+  const API_KEY = "AIzaSyD-Zjbfq2jpi9Vr1X_epT1zYkEt550Xrro";
 
-  useEffect(() => {
-    if ("ai" in self && "summarizer" in self.ai) {
-      setSummarizerAvailable(true);
-    } else {
-      setSummarizerAvailable(false);
-    }
-  }, []);
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!textMessage.trim()){
-      setErrorMessage("Please enter text to translate."); 
+    setApiError(""); // Clear previous errors
+
+    if (!textMessage.trim()) {
+      setErrorMessage("⚠️ Please enter text to translate.");
       return;
-    } else{
-      setErrorMessage('')
+    } else {
+      setErrorMessage("");
     }
 
-    setMessages(textMessage); 
-    setTextMessage(""); 
+    setMessages(textMessage);
+    setTextMessage("");
 
     try {
       const detectResponse = await axios.post(
@@ -47,17 +41,20 @@ const ChatInput = ({ setMessages, setTranslatedMessage, setSummaryMessage, setDe
 
       const detectedLangCode = detectResponse.data.data.detections[0][0].language;
       const detectedLangName = languageMap[detectedLangCode] || "Unknown Language";
-
       setDetectedLang(detectedLangName);
 
       handleTranslate(textMessage, targetLang);
     } catch (error) {
-      console.error("Error processing message:", error);
+      setApiError(`❌ Failed to detect language. Please try again later. ${error}`);
     }
   };
 
+
+
   const handleTranslate = async (text = messages, target = targetLang) => {
-    if (!text.trim()) return; 
+    if (!text.trim()) return;
+
+    setApiError(""); // Clear previous errors
 
     try {
       const response = await axios.post(
@@ -69,49 +66,15 @@ const ChatInput = ({ setMessages, setTranslatedMessage, setSummaryMessage, setDe
       const translatedText = response.data.data.translations[0].translatedText;
       setTranslatedMessage(translatedText);
     } catch (error) {
-      console.error("Translation API error:", error);
+      console.error("Translation API Error:", error);
+
+      if (!navigator.onLine) {
+        setApiError("⚠️ No internet connection. Please check your network.");
+      } else {
+        setApiError("❌ Service Unavailable Please try again later.");
+      }
     }
   };
-
-const handleSummarize = async () => {
-  if (!messages || messages.length < 150) {
-    setSummaryMessage("Text is too short to summarize.");
-    return;
-  }
-
-  try {
-    console.log("Checking Summarizer API capabilities...");
-
-    const capabilities = await self.ai.summarizer.capabilities();
-    console.log("Summarizer Capabilities:", capabilities);
-
-    if (capabilities.available === "no") {
-      throw new Error("Summarizer API is not available in this environment.");
-    }
-
-    console.log("Creating summarizer instance...");
-
-    const summarizer = await self.ai.summarizer.create({
-      type: "key-points",
-      format: "plain-text",
-      length: "medium",
-    });
-
-    console.log("Summarizer Instance:", summarizer);
-
-    if (typeof summarizer.summarize !== "function") {
-      throw new Error("Summarizer instance does not have a summarize() function.");
-    }
-
-    const response = await summarizer.summarize(messages, {
-      context: "Summarize this conversation.",
-    });
-
-    setSummaryMessage(response.summary || "No summary available.");
-  } catch (error) {
-    setSummaryMessage(`Error summarizing text. Please try again. ${error}`);
-  }
-};
 
   return (
     <div className="chat-input">
@@ -131,43 +94,34 @@ const handleSummarize = async () => {
               aria-label="Enter text to translate"
             ></textarea>
             {errorMessage && <p className="error-message">{errorMessage}</p>}
-
+            {apiError && <p className="error-message">{apiError}</p>}
           </div>
 
           <div className="action-buttons">
-            <div >
+            <div>
               <label htmlFor="language-select" className="visually-hidden-button">
-                  Select translation language
+                Select translation language
               </label>
               <div className="action-button">
                 <div className="action-button-select">
-                  <select 
-                    className="language-select" 
-                    value={targetLang} 
-                    onChange={(e) => setTargetLang(e.target.value)} 
+                  <select
+                    className="language-select"
+                    value={targetLang}
+                    onChange={(e) => setTargetLang(e.target.value)}
                     aria-label="Select translation language"
                   >
                     {Object.entries(languageMap).map(([code, name]) => (
                       <option key={code} value={code}>{name}</option>
                     ))}
                   </select>
-                  <button 
-                    className="translate-btn" 
-                    type="button" 
+                  <button
+                    className="translate-btn"
+                    type="button"
                     onClick={() => handleTranslate(messages, targetLang)}
                     aria-label="Translate text"
                   >
                     Translate
                   </button>
-                  {messages.length > 150 && summarizerAvailable && ( 
-                  <button 
-                    className="summarize-btn" 
-                    type="button" 
-                    onClick={handleSummarize} 
-                    aria-label="Summarize text"
-                  >
-                    Summarize
-                  </button> )}
                 </div>
                 <button className="send-btn" type="submit" aria-label="Send message">
                   <i className="ri-send-plane-2-fill" role="button" tabIndex="0"></i>
@@ -182,4 +136,5 @@ const handleSummarize = async () => {
 };
 
 export default ChatInput;
+
 
